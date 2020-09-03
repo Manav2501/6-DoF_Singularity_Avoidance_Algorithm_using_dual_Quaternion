@@ -1,0 +1,338 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Main_code</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-26"><meta name="DC.source" content="Main_code.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Numerical Comparison</a></li><li><a href="#2">Loading DH Parameters</a></li><li><a href="#3">KR3 Euler</a></li><li><a href="#4">KR3 Dual Quaternion</a></li><li><a href="#5">ABB IRB140 Euler</a></li><li><a href="#6">ABB IRB140 Dual Quaternion</a></li><li><a href="#7">Mitsubishi RV-2AJ Euler</a></li><li><a href="#8">Mitsubishi RV-2AJ Dual Quaternion</a></li></ul></div><h2 id="1">Numerical Comparison</h2><p>In this section, Euler approach and Dual Quaternion approach are compared and stored into a particular structure. One example is also shown for getting values.</p><pre class="codeinput">clear <span class="string">all</span>;
+clc;
+close <span class="string">all</span>;
+</pre><h2 id="2">Loading DH Parameters</h2><pre class="codeinput">load(<span class="string">'DH_para_robots.mat'</span>);
+</pre><h2 id="3">KR3 Euler</h2><pre class="codeinput">        <span class="comment">% Elbow Non-Singuler</span>
+        kr3.Euler.Elbow.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        kr3.Euler.Elbow.Non_Singular = KR3_Eular(kr3.Euler.Elbow.Non_Singular_Theta,KR3);
+
+        <span class="comment">% Elbow Singuler</span>
+        kr3.Euler.Elbow.Singular_Theta = [deg2rad(0) deg2rad(49.5) deg2rad(-4.5) deg2rad(80) deg2rad(30) deg2rad(30)];
+        kr3.Euler.Elbow.Singular = KR3_Eular(kr3.Euler.Elbow.Singular_Theta,KR3);
+
+        <span class="comment">% Wrist Non-Singuler</span>
+        kr3.Euler.Wrist.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        kr3.Euler.Wrist.Non_Singular = KR3_Eular(kr3.Euler.Wrist.Non_Singular_Theta,KR3);
+
+        <span class="comment">% wrist Singuler</span>
+        kr3.Euler.Wrist.Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(0) deg2rad(30)];
+        kr3.Euler.Wrist.Singular = KR3_Eular(kr3.Euler.Wrist.Singular_Theta,KR3);
+</pre><h2 id="4">KR3 Dual Quaternion</h2><pre class="codeinput">        <span class="comment">% Elbow Non-Singuler</span>
+        kr3.Dual_Quat.Elbow.Non_Singular_Theta = kr3.Euler.Elbow.Non_Singular_Theta;
+        kr3.Dual_Quat.Elbow.Non_Singular = KR3_Quaternion(kr3.Dual_Quat.Elbow.Non_Singular_Theta);
+
+        <span class="comment">% Elbow Singuler</span>
+        kr3.Dual_Quat.Elbow.Singular_Theta = kr3.Euler.Elbow.Singular_Theta;
+        kr3.Dual_Quat.Elbow.Singular = KR3_Quaternion(kr3.Dual_Quat.Elbow.Singular_Theta);
+
+        <span class="comment">% Wrist Non-Singuler</span>
+        kr3.Dual_Quat.Wrist.Non_Singular_Theta = kr3.Euler.Wrist.Non_Singular_Theta;
+        kr3.Dual_Quat.Wrist.Non_Singular = KR3_Quaternion(kr3.Dual_Quat.Wrist.Non_Singular_Theta);
+
+        <span class="comment">% Wrist Singuler</span>
+        kr3.Dual_Quat.Wrist.Singular_Theta = kr3.Euler.Wrist.Singular_Theta;
+        kr3.Dual_Quat.Wrist.Singular = KR3_Quaternion(kr3.Dual_Quat.Wrist.Singular_Theta);
+
+        <span class="comment">%Example</span>
+        kr3
+        kr3.Euler
+        kr3.Euler.Elbow
+        kr3.Euler.Elbow.Non_Singular
+        kr3.Euler.Elbow.Non_Singular.jcob
+</pre><pre class="codeoutput">
+kr3 = 
+
+  struct with fields:
+
+        Euler: [1&times;1 struct]
+    Dual_Quat: [1&times;1 struct]
+
+
+ans = 
+
+  struct with fields:
+
+    Elbow: [1&times;1 struct]
+    Wrist: [1&times;1 struct]
+
+
+ans = 
+
+  struct with fields:
+
+    Non_Singular_Theta: [0 0.5236 -0.7854 1.3963 0.5236 0.5236]
+          Non_Singular: [1&times;1 struct]
+        Singular_Theta: [0 0.8639 -0.0785 1.3963 0.5236 0.5236]
+              Singular: [1&times;1 struct]
+
+
+ans = 
+
+  struct with fields:
+
+     jcob: [6&times;6 double]
+     jdet: -0.0111
+    jcond: 24.7028
+    jrank: 6
+    trans: [3&times;6 double]
+     tdet: 8.2724e-04
+    tcond: 8.5143
+    trank: 3
+      rot: [3&times;6 double]
+     rdet: 6.3481
+    rcond: 1.6265
+    rrank: 3
+
+
+ans =
+
+    0.0000   -0.1014    0.0286   -0.0000   -0.0194         0
+    0.5739   -0.0000   -0.0000   -0.0375   -0.0000         0
+   -0.0000    0.5539    0.3288    0.0000    0.0724         0
+    0.0000   -0.0000   -0.0000    0.9659   -0.0000    0.9659
+   -0.0000   -1.0000   -1.0000   -0.0000   -1.0000   -0.0000
+    1.0000    0.0000    0.0000   -0.2588    0.0000    0.2588
+
+</pre><h2 id="5">ABB IRB140 Euler</h2><pre class="codeinput">        <span class="comment">% Elbow Non-Singuler</span>
+        abb.Euler.Elbow.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        abb.Euler.Elbow.Non_Singular = ABB_Eular(abb.Euler.Elbow.Non_Singular_Theta,irb140);
+
+        <span class="comment">% Elbow Singuler</span>
+        abb.Euler.Elbow.Singular_Theta = [deg2rad(0) deg2rad(49.5) deg2rad(-4.5) deg2rad(80) deg2rad(30) deg2rad(30)];
+        abb.Euler.Elbow.Singular = ABB_Eular(abb.Euler.Elbow.Singular_Theta,irb140);
+
+        <span class="comment">% Wrist Non-Singuler</span>
+        abb.Euler.Wrist.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        abb.Euler.Wrist.Non_Singular = ABB_Eular(abb.Euler.Wrist.Non_Singular_Theta,irb140);
+
+        <span class="comment">% wrist Singuler</span>
+        abb.Euler.Wrist.Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(0) deg2rad(30)];
+        abb.Euler.Wrist.Singular = ABB_Eular(abb.Euler.Wrist.Singular_Theta,irb140);
+</pre><h2 id="6">ABB IRB140 Dual Quaternion</h2><pre class="codeinput">        <span class="comment">% Elbow Non-Singuler</span>
+        abb.Dual_Quat.Elbow.Non_Singular_Theta = abb.Euler.Elbow.Non_Singular_Theta;
+        abb.Dual_Quat.Elbow.Non_Singular = ABB_Quaternion(abb.Dual_Quat.Elbow.Non_Singular_Theta);
+
+        <span class="comment">% Elbow Singuler</span>
+        abb.Dual_Quat.Elbow.Singular_Theta = abb.Euler.Elbow.Singular_Theta;
+        abb.Dual_Quat.Elbow.Singular = ABB_Quaternion(abb.Dual_Quat.Elbow.Singular_Theta);
+
+        <span class="comment">% Wrist Non-Singuler</span>
+        abb.Dual_Quat.Wrist.Non_Singular_Theta = abb.Euler.Wrist.Non_Singular_Theta;
+        abb.Dual_Quat.Wrist.Non_Singular = ABB_Quaternion(abb.Dual_Quat.Wrist.Non_Singular_Theta);
+
+        <span class="comment">% Wrist Singuler</span>
+        abb.Dual_Quat.Wrist.Singular_Theta = abb.Euler.Wrist.Singular_Theta;
+        abb.Dual_Quat.Wrist.Singular = ABB_Quaternion(abb.Dual_Quat.Wrist.Singular_Theta);
+</pre><h2 id="7">Mitsubishi RV-2AJ Euler</h2><pre class="codeinput">        <span class="comment">% Elbow Non-Singuler</span>
+        rv2aj.Euler.Elbow.Non_Singular_Theta = [deg2rad(0) deg2rad(45) deg2rad(60) deg2rad(30) deg2rad(30)];
+        rv2aj.Euler.Elbow.Non_Singular = RV2_Eular(rv2aj.Euler.Elbow.Non_Singular_Theta,rv2);
+
+        <span class="comment">% Elbow Singuler</span>
+        rv2aj.Euler.Elbow.Singular_Theta = [deg2rad(0) deg2rad(45) deg2rad(0) deg2rad(30) deg2rad(30)];
+        rv2aj.Euler.Elbow.Singular = RV2_Eular(rv2aj.Euler.Elbow.Singular_Theta,rv2);
+
+        <span class="comment">% Wrist Non-Singuler</span>
+        rv2aj.Euler.Wrist.Non_Singular_Theta = [deg2rad(0) deg2rad(45) deg2rad(60) deg2rad(30) deg2rad(30)];
+        rv2aj.Euler.Wrist.Non_Singular = RV2_Eular(rv2aj.Euler.Wrist.Non_Singular_Theta,rv2);
+</pre><h2 id="8">Mitsubishi RV-2AJ Dual Quaternion</h2><pre class="codeinput">        <span class="comment">% Elbow Non-Singuler</span>
+        rv2aj.Dual_Quat.Elbow.Non_Singular_Theta = rv2aj.Euler.Elbow.Non_Singular_Theta;
+        rv2aj.Dual_Quat.Elbow.Non_Singular = RV2_Quaternion(rv2aj.Dual_Quat.Elbow.Non_Singular_Theta);
+
+        <span class="comment">% Elbow Singuler</span>
+        rv2aj.Dual_Quat.Elbow.Singular_Theta = rv2aj.Euler.Elbow.Singular_Theta;
+        rv2aj.Dual_Quat.Elbow.Singular = RV2_Quaternion(rv2aj.Dual_Quat.Elbow.Singular_Theta);
+
+        <span class="comment">% Wrist Non-Singuler</span>
+        rv2aj.Dual_Quat.Wrist.Non_Singular_Theta = rv2aj.Euler.Wrist.Non_Singular_Theta;
+        rv2aj.Dual_Quat.Wrist.Non_Singular = RV2_Quaternion(rv2aj.Dual_Quat.Wrist.Non_Singular_Theta);
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Numerical Comparison
+% In this section, Euler approach and Dual Quaternion approach are compared and stored into a particular structure. 
+% One example is also shown for getting values.
+
+clear all;
+clc;
+close all;
+
+%% Loading DH Parameters
+load('DH_para_robots.mat');
+
+%% KR3 Euler
+    
+        % Elbow Non-Singuler
+        kr3.Euler.Elbow.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        kr3.Euler.Elbow.Non_Singular = KR3_Eular(kr3.Euler.Elbow.Non_Singular_Theta,KR3);
+        
+        % Elbow Singuler
+        kr3.Euler.Elbow.Singular_Theta = [deg2rad(0) deg2rad(49.5) deg2rad(-4.5) deg2rad(80) deg2rad(30) deg2rad(30)];
+        kr3.Euler.Elbow.Singular = KR3_Eular(kr3.Euler.Elbow.Singular_Theta,KR3);
+          
+        % Wrist Non-Singuler
+        kr3.Euler.Wrist.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        kr3.Euler.Wrist.Non_Singular = KR3_Eular(kr3.Euler.Wrist.Non_Singular_Theta,KR3);
+        
+        % wrist Singuler
+        kr3.Euler.Wrist.Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(0) deg2rad(30)];
+        kr3.Euler.Wrist.Singular = KR3_Eular(kr3.Euler.Wrist.Singular_Theta,KR3);
+        
+%% KR3 Dual Quaternion
+        
+        % Elbow Non-Singuler
+        kr3.Dual_Quat.Elbow.Non_Singular_Theta = kr3.Euler.Elbow.Non_Singular_Theta;
+        kr3.Dual_Quat.Elbow.Non_Singular = KR3_Quaternion(kr3.Dual_Quat.Elbow.Non_Singular_Theta);
+        
+        % Elbow Singuler
+        kr3.Dual_Quat.Elbow.Singular_Theta = kr3.Euler.Elbow.Singular_Theta;
+        kr3.Dual_Quat.Elbow.Singular = KR3_Quaternion(kr3.Dual_Quat.Elbow.Singular_Theta);
+        
+        % Wrist Non-Singuler
+        kr3.Dual_Quat.Wrist.Non_Singular_Theta = kr3.Euler.Wrist.Non_Singular_Theta;
+        kr3.Dual_Quat.Wrist.Non_Singular = KR3_Quaternion(kr3.Dual_Quat.Wrist.Non_Singular_Theta);
+        
+        % Wrist Singuler
+        kr3.Dual_Quat.Wrist.Singular_Theta = kr3.Euler.Wrist.Singular_Theta;
+        kr3.Dual_Quat.Wrist.Singular = KR3_Quaternion(kr3.Dual_Quat.Wrist.Singular_Theta);
+        
+        %Example
+        kr3
+        kr3.Euler
+        kr3.Euler.Elbow
+        kr3.Euler.Elbow.Non_Singular
+        kr3.Euler.Elbow.Non_Singular.jcob
+        
+%% ABB IRB140 Euler
+    
+        % Elbow Non-Singuler
+        abb.Euler.Elbow.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        abb.Euler.Elbow.Non_Singular = ABB_Eular(abb.Euler.Elbow.Non_Singular_Theta,irb140);
+        
+        % Elbow Singuler
+        abb.Euler.Elbow.Singular_Theta = [deg2rad(0) deg2rad(49.5) deg2rad(-4.5) deg2rad(80) deg2rad(30) deg2rad(30)];
+        abb.Euler.Elbow.Singular = ABB_Eular(abb.Euler.Elbow.Singular_Theta,irb140);
+          
+        % Wrist Non-Singuler
+        abb.Euler.Wrist.Non_Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(30) deg2rad(30)];
+        abb.Euler.Wrist.Non_Singular = ABB_Eular(abb.Euler.Wrist.Non_Singular_Theta,irb140);
+        
+        % wrist Singuler
+        abb.Euler.Wrist.Singular_Theta = [deg2rad(0) deg2rad(30) deg2rad(-45) deg2rad(80) deg2rad(0) deg2rad(30)];
+        abb.Euler.Wrist.Singular = ABB_Eular(abb.Euler.Wrist.Singular_Theta,irb140);
+        
+        
+%% ABB IRB140 Dual Quaternion
+    
+        % Elbow Non-Singuler
+        abb.Dual_Quat.Elbow.Non_Singular_Theta = abb.Euler.Elbow.Non_Singular_Theta;
+        abb.Dual_Quat.Elbow.Non_Singular = ABB_Quaternion(abb.Dual_Quat.Elbow.Non_Singular_Theta);
+        
+        % Elbow Singuler
+        abb.Dual_Quat.Elbow.Singular_Theta = abb.Euler.Elbow.Singular_Theta;
+        abb.Dual_Quat.Elbow.Singular = ABB_Quaternion(abb.Dual_Quat.Elbow.Singular_Theta);
+        
+        % Wrist Non-Singuler
+        abb.Dual_Quat.Wrist.Non_Singular_Theta = abb.Euler.Wrist.Non_Singular_Theta;
+        abb.Dual_Quat.Wrist.Non_Singular = ABB_Quaternion(abb.Dual_Quat.Wrist.Non_Singular_Theta);
+        
+        % Wrist Singuler
+        abb.Dual_Quat.Wrist.Singular_Theta = abb.Euler.Wrist.Singular_Theta;
+        abb.Dual_Quat.Wrist.Singular = ABB_Quaternion(abb.Dual_Quat.Wrist.Singular_Theta);
+        
+%% Mitsubishi RV-2AJ Euler
+    
+        % Elbow Non-Singuler
+        rv2aj.Euler.Elbow.Non_Singular_Theta = [deg2rad(0) deg2rad(45) deg2rad(60) deg2rad(30) deg2rad(30)];
+        rv2aj.Euler.Elbow.Non_Singular = RV2_Eular(rv2aj.Euler.Elbow.Non_Singular_Theta,rv2);
+        
+        % Elbow Singuler
+        rv2aj.Euler.Elbow.Singular_Theta = [deg2rad(0) deg2rad(45) deg2rad(0) deg2rad(30) deg2rad(30)];
+        rv2aj.Euler.Elbow.Singular = RV2_Eular(rv2aj.Euler.Elbow.Singular_Theta,rv2);
+          
+        % Wrist Non-Singuler
+        rv2aj.Euler.Wrist.Non_Singular_Theta = [deg2rad(0) deg2rad(45) deg2rad(60) deg2rad(30) deg2rad(30)];
+        rv2aj.Euler.Wrist.Non_Singular = RV2_Eular(rv2aj.Euler.Wrist.Non_Singular_Theta,rv2);   
+          
+%% Mitsubishi RV-2AJ Dual Quaternion
+        
+        % Elbow Non-Singuler
+        rv2aj.Dual_Quat.Elbow.Non_Singular_Theta = rv2aj.Euler.Elbow.Non_Singular_Theta;
+        rv2aj.Dual_Quat.Elbow.Non_Singular = RV2_Quaternion(rv2aj.Dual_Quat.Elbow.Non_Singular_Theta);
+        
+        % Elbow Singuler
+        rv2aj.Dual_Quat.Elbow.Singular_Theta = rv2aj.Euler.Elbow.Singular_Theta;
+        rv2aj.Dual_Quat.Elbow.Singular = RV2_Quaternion(rv2aj.Dual_Quat.Elbow.Singular_Theta);
+        
+        % Wrist Non-Singuler
+        rv2aj.Dual_Quat.Wrist.Non_Singular_Theta = rv2aj.Euler.Wrist.Non_Singular_Theta;
+        rv2aj.Dual_Quat.Wrist.Non_Singular = RV2_Quaternion(rv2aj.Dual_Quat.Wrist.Non_Singular_Theta);
+          
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,256 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Quaternion_Simulink_Model</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-26"><meta name="DC.source" content="Quaternion_Simulink_Model.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">DH Parameter of Manipulator</a></li><li><a href="#2">Input</a></li><li><a href="#3">Quaternion Calculation</a></li><li><a href="#5">Quaternion Conversion</a></li><li><a href="#6">Inverse Kinematics</a></li><li><a href="#7">Checking Joint Limitation</a></li><li><a href="#8">Validating with Forward Kinematics</a></li><li><a href="#9">Checking Singularities</a></li><li><a href="#11">Simulink Data Generation</a></li><li><a href="#12">Simulink Model</a></li></ul></div><h2 id="1">DH Parameter of Manipulator</h2><p>DH-Parameter is the configuration that is needed to generate the robot simulation. Using those configurations a robot can be built into a software to generate for simulation. Here Robotic Toolbox of Peter Corke's is used for generating manipulators into MATLAB. As seen below, it can be seen that each joint of a manipulator is defined into an array, and then that array is called into the SerialLink which generates the manipulator based on the DH-Parameter.</p><pre class="codeinput">clear <span class="string">all</span>;
+clc;
+close <span class="string">all</span>;
+
+L (1) = Revolute(<span class="string">'d'</span>,0.345  ,<span class="string">'a'</span>,0.02   ,<span class="string">'alpha'</span>,pi/2       ,<span class="string">'qlim'</span>,[-2.9671 2.9671],   <span class="string">'offset'</span>,0);
+L (2) = Revolute(<span class="string">'d'</span>,0      ,<span class="string">'a'</span>,0.260  ,<span class="string">'alpha'</span>,0          ,<span class="string">'qlim'</span>,[-0.8727 2.9671],   <span class="string">'offset'</span>,0);
+L (3) = Revolute(<span class="string">'d'</span>,0      ,<span class="string">'a'</span>,0.02   ,<span class="string">'alpha'</span>,pi/2       ,<span class="string">'qlim'</span>,[-2.7053 1.9198],   <span class="string">'offset'</span>,pi/2);
+L (4) = Revolute(<span class="string">'d'</span>,0.260  ,<span class="string">'a'</span>,0      ,<span class="string">'alpha'</span>,(-pi/2)    ,<span class="string">'qlim'</span>,[-3.0543 3.0543],   <span class="string">'offset'</span>,(-80*pi)/180);
+L (5) = Revolute(<span class="string">'d'</span>,0      ,<span class="string">'a'</span>,0      ,<span class="string">'alpha'</span>,(pi/2)     ,<span class="string">'qlim'</span>,[-2.0945 2.0945],   <span class="string">'offset'</span>,0);
+L (6) = Revolute(<span class="string">'d'</span>,0.075  ,<span class="string">'a'</span>,0      ,<span class="string">'alpha'</span>,0          ,<span class="string">'qlim'</span>,[-6.1087 6.1087],   <span class="string">'offset'</span>,0);
+qz = [0 0 0 0 0 0];
+KR3 = SerialLink(L,<span class="string">'name'</span>,<span class="string">'KUKA KR3 Agilus'</span>);
+KR3.manufacturer = <span class="string">'JD &amp; M'</span>;
+KR3.ikineType = <span class="string">'KR3'</span>;
+</pre><h2 id="2">Input</h2><p>In this section, The task space points which are generated using other software like SolidWorks are being converted using the ConversionC function into an array. Time limit is also given to complete the given task.</p><pre class="codeinput"><span class="comment">% Points = conversionP('Trianguler_Piramid.csv');</span>
+Points = conversionC(<span class="string">'Circle.csv'</span>);
+N = length(Points(1,:));
+timeDuration = 10;
+</pre><h2 id="3">Quaternion Calculation</h2><pre class="codeinput">tic
+<span class="keyword">for</span> k = 1:N
+</pre><h2 id="5">Quaternion Conversion</h2><p>As the Dual Quaternion has its own condition which needs to be satisfied before further use of it. All the Points that are generated above are being converted into the Quaternion form and also it's being checked for the Dual Quaternion Condition.</p><pre class="codeinput">        Des = Quat_Conversion(Points(:,k));
+</pre><h2 id="6">Inverse Kinematics</h2><p>In this section, Inverse kinematics is solved for the above-generated trajectory. Due to the absence of an analytical solution of KR3, the numerical iterative solution is used to calculate the inverse kinematics of the given trajectory using the fsolve. Although the analytical solution is derived partially and it's used as the initial value need into the fsolve. Initial Values are given for the fsolve. it can be changed as per desired although it can affect the solution for a few points in the beginning.</p><pre class="codeinput">        <span class="keyword">if</span>(k == 1)
+            Ini = [pi/6 pi/6 pi/6 pi/6 pi/6 pi/6];
+        <span class="keyword">else</span>
+            Ini = OPx(:,k-1);
+        <span class="keyword">end</span>
+        Func = 1e-6;
+        Step = 1e-6;
+        options = optimoptions(<span class="string">'fsolve'</span>,<span class="string">'Display'</span>,<span class="string">'off'</span>,<span class="string">'Algorithm'</span>,<span class="string">'levenberg-marquardt'</span>,<span class="string">'FunValCheck'</span>,<span class="string">'on'</span>,<span class="string">'FunctionTolerance'</span>,Func,<span class="string">'StepTolerance'</span>,Step);
+        tempOPx(:,k) = fsolve(@ikine_Quat,Ini,options,Des);
+</pre><h2 id="7">Checking Joint Limitation</h2><p>Here to avoid collision of the joints into the simulation, a filter is used for joint angles. which converts the angle from one quadrant to another quadrant.</p><pre class="codeinput">        OPx(:,k) = trimTheta(tempOPx(:,k),KR3);
+</pre><pre class="codeoutput">Warning:  Q-limit Reached at Theta One 
+</pre><h2 id="8">Validating with Forward Kinematics</h2><p>Forward kinematics is calculated to verify the inverse kinematics.</p><pre class="codeinput">        [Co_Ordinates(:,:,k),Angles(:,:,k)] = fkineQ(OPx(:,k));
+</pre><h2 id="9">Checking Singularities</h2><p>To detect any type of singularity, a conditional filter is used in which the Jacobian Matrix is calculated and its determinant is the which is used to separate the singular pose.</p><pre class="codeinput">        j(:,:,k) = jacobianQ(OPx(:,k));
+        psinv = pinv(j(:,:,k),1e-4);
+        psuedoDet(:,:,k) = j(:,:,k)'*j(:,:,k);
+        Determinant(:,:,k) = det(psuedoDet(:,:,k));
+
+<span class="comment">%         if ((Determinant(k) &lt;= 1e-4) &amp;&amp; (Determinant(k) &gt;= (-(1e-4))))</span>
+<span class="comment">%             fprintf('\n Jacobian of the pose(%d).\n',k);</span>
+<span class="comment">%             fprintf('\n Determinant of the pose(%d): %f\n',k,Determinant(:,:,k));</span>
+<span class="comment">%             warning('Determinant of the pose is zero.It shows the singularity.')</span>
+<span class="comment">%         end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+
+toc
+</pre><pre class="codeoutput">Elapsed time is 18.038074 seconds.
+</pre><h2 id="11">Simulink Data Generation</h2><p>Data set is being generated in this section which is used as an input for the Simulink Model. All the data has been calculated above and has been filtered as per the need.</p><pre class="codeinput">th1 = reshape(OPx(1,:),[],1);
+th2 = reshape(OPx(2,:),[],1);
+th3 = reshape(OPx(3,:),[],1);
+th4 = reshape(OPx(4,:),[],1);
+th5 = reshape(OPx(5,:),[],1);
+th6 = reshape(OPx(6,:),[],1);
+Time = linspace(0,timeDuration,length(th1))';
+TimeStamp = Time(2);
+Th1 = [Time th1];
+Th2 = [Time th2];
+Th3 = [Time th3];
+Th4 = [Time th4];
+Th5 = [Time th5];
+Th6 = [Time th6];
+DesX = [Time Points(1,:)'];
+DesY = [Time Points(2,:)'];
+DesZ = [Time Points(3,:)'];
+theta = [th1 th2 th3 th4 th5 th6];
+
+wayPoints = [Points(1,:); Points(2,:); Points(3,:)]';
+</pre><h2 id="12">Simulink Model</h2><p>Simulink allows us to replicate the outside environment in which manipulators will be used. The Simulink model is can be generated by either importing the assembly of the manipulators or generating the mechanical circuit manually. The below command will open the Simulink model required for the simulation of an above-generated manipulator. After it opens, simply press cntrl+D to update and compile the Simulink model. After it gets compiled, a window will open containing the manipulator. Then simply press the cntrl+T or play button in the window to run the simulation.</p><pre class="codeinput">open_system(<span class="string">'Simscape_Model_ver_3.slx'</span>);
+</pre><img vspace="5" hspace="5" src="Quaternion_Simulink_Model_01.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% DH Parameter of Manipulator
+% DH-Parameter is the configuration that is needed to generate the robot simulation.
+% Using those configurations a robot can be built into a software to generate for simulation.
+% Here Robotic Toolbox of Peter Corke's is used for generating manipulators into MATLAB.
+% As seen below, it can be seen that each joint of a manipulator is defined into an array, and then that array is called into the SerialLink which generates the manipulator based on the DH-Parameter.
+
+clear all;
+clc;
+close all;
+
+L (1) = Revolute('d',0.345  ,'a',0.02   ,'alpha',pi/2       ,'qlim',[-2.9671 2.9671],   'offset',0);
+L (2) = Revolute('d',0      ,'a',0.260  ,'alpha',0          ,'qlim',[-0.8727 2.9671],   'offset',0);
+L (3) = Revolute('d',0      ,'a',0.02   ,'alpha',pi/2       ,'qlim',[-2.7053 1.9198],   'offset',pi/2);
+L (4) = Revolute('d',0.260  ,'a',0      ,'alpha',(-pi/2)    ,'qlim',[-3.0543 3.0543],   'offset',(-80*pi)/180);
+L (5) = Revolute('d',0      ,'a',0      ,'alpha',(pi/2)     ,'qlim',[-2.0945 2.0945],   'offset',0);
+L (6) = Revolute('d',0.075  ,'a',0      ,'alpha',0          ,'qlim',[-6.1087 6.1087],   'offset',0);
+qz = [0 0 0 0 0 0];
+KR3 = SerialLink(L,'name','KUKA KR3 Agilus');
+KR3.manufacturer = 'JD & M';
+KR3.ikineType = 'KR3';
+
+%% Input
+% In this section, The task space points which are generated using other software like SolidWorks are being converted using the ConversionC function into an array.
+% Time limit is also given to complete the given task.
+
+% Points = conversionP('Trianguler_Piramid.csv');
+Points = conversionC('Circle.csv');
+N = length(Points(1,:));
+timeDuration = 10;
+
+%% Quaternion Calculation
+tic
+for k = 1:N
+
+%% Quaternion Conversion
+% As the Dual Quaternion has its own condition which needs to be satisfied before further use of it.
+% All the Points that are generated above are being converted into the Quaternion form and also it's being checked for the Dual Quaternion Condition.
+		
+        Des = Quat_Conversion(Points(:,k));
+          
+%% Inverse Kinematics
+% In this section, Inverse kinematics is solved for the above-generated trajectory.
+% Due to the absence of an analytical solution of KR3, the numerical iterative solution is used to calculate the inverse kinematics of the given trajectory using the fsolve.
+% Although the analytical solution is derived partially and it's used as the initial value need into the fsolve.
+% Initial Values are given for the fsolve. it can be changed as per desired although it can affect the solution for a few points in the beginning.
+
+        if(k == 1)
+            Ini = [pi/6 pi/6 pi/6 pi/6 pi/6 pi/6];
+        else
+            Ini = OPx(:,k-1);
+        end
+        Func = 1e-6;
+        Step = 1e-6; 
+        options = optimoptions('fsolve','Display','off','Algorithm','levenberg-marquardt','FunValCheck','on','FunctionTolerance',Func,'StepTolerance',Step);
+        tempOPx(:,k) = fsolve(@ikine_Quat,Ini,options,Des);
+		
+%% Checking Joint Limitation 
+% Here to avoid collision of the joints into the simulation, a filter is used for joint angles. which converts the angle from one quadrant to another quadrant.
+
+        OPx(:,k) = trimTheta(tempOPx(:,k),KR3);
+        
+%% Validating with Forward Kinematics    
+% Forward kinematics is calculated to verify the inverse kinematics.
+		
+        [Co_Ordinates(:,:,k),Angles(:,:,k)] = fkineQ(OPx(:,k));
+		
+%% Checking Singularities 
+% To detect any type of singularity, a conditional filter is used in which the Jacobian Matrix is calculated and its determinant is the which is used to separate the singular pose.
+		
+        j(:,:,k) = jacobianQ(OPx(:,k));        
+        psinv = pinv(j(:,:,k),1e-4);        
+        psuedoDet(:,:,k) = j(:,:,k)'*j(:,:,k);
+        Determinant(:,:,k) = det(psuedoDet(:,:,k));
+        
+%         if ((Determinant(k) <= 1e-4) && (Determinant(k) >= (-(1e-4))))
+%             fprintf('\n Jacobian of the pose(%d).\n',k);
+%             fprintf('\n Determinant of the pose(%d): %f\n',k,Determinant(:,:,k));
+%             warning('Determinant of the pose is zero.It shows the singularity.')
+%         end
+end
+
+toc
+%% Simulink Data Generation
+% Data set is being generated in this section which is used as an input for the Simulink Model.
+% All the data has been calculated above and has been filtered as per the need.
+
+th1 = reshape(OPx(1,:),[],1);
+th2 = reshape(OPx(2,:),[],1);
+th3 = reshape(OPx(3,:),[],1);
+th4 = reshape(OPx(4,:),[],1);
+th5 = reshape(OPx(5,:),[],1);
+th6 = reshape(OPx(6,:),[],1);
+Time = linspace(0,timeDuration,length(th1))';
+TimeStamp = Time(2);
+Th1 = [Time th1];
+Th2 = [Time th2];
+Th3 = [Time th3];
+Th4 = [Time th4];
+Th5 = [Time th5];
+Th6 = [Time th6];
+DesX = [Time Points(1,:)'];
+DesY = [Time Points(2,:)'];
+DesZ = [Time Points(3,:)'];
+theta = [th1 th2 th3 th4 th5 th6];
+
+wayPoints = [Points(1,:); Points(2,:); Points(3,:)]';
+
+%% Simulink Model
+% Simulink allows us to replicate the outside environment in which manipulators will be used.
+% The Simulink model is can be generated by either importing the assembly of the manipulators or generating the mechanical circuit manually.
+% The below command will open the Simulink model required for the simulation of an above-generated manipulator.
+% After it opens, simply press cntrl+D to update and compile the Simulink model.
+% After it gets compiled, a window will open containing the manipulator. Then simply press the cntrl+T or play button in the window to run the simulation.
+
+open_system('Simscape_Model_ver_3.slx');
+
+##### SOURCE END #####
+--></body></html>

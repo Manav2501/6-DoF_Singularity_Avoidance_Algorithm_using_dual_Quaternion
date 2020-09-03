@@ -1,0 +1,279 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>First_Final_Model</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-25"><meta name="DC.source" content="First_Final_Model.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">DH Parameter of Manipulator</a></li><li><a href="#2">Inputs</a></li><li><a href="#3">Trajectory</a></li><li><a href="#4">Inverse Kinematics</a></li><li><a href="#6">Checking Joint Limitation</a></li><li><a href="#7">Checking Singularities</a></li><li><a href="#9">Simulink Data Generation</a></li><li><a href="#10">Simulink Model</a></li></ul></div><h2 id="1">DH Parameter of Manipulator</h2><p>abcd abcd</p><pre class="codeinput">clear <span class="string">all</span>;
+clc;
+close <span class="string">all</span>;
+
+L (1) = Revolute(<span class="string">'d'</span>,0.345  ,<span class="string">'a'</span>,0.02   ,<span class="string">'alpha'</span>,pi/2       ,<span class="string">'qlim'</span>,[-2.9671 2.9671],   <span class="string">'offset'</span>,0);
+L (2) = Revolute(<span class="string">'d'</span>,0      ,<span class="string">'a'</span>,0.260  ,<span class="string">'alpha'</span>,0          ,<span class="string">'qlim'</span>,[-0.8727 2.9671],   <span class="string">'offset'</span>,0);
+L (3) = Revolute(<span class="string">'d'</span>,0      ,<span class="string">'a'</span>,0.02   ,<span class="string">'alpha'</span>,pi/2       ,<span class="string">'qlim'</span>,[-2.7053 1.9198],   <span class="string">'offset'</span>,pi/2);
+L (4) = Revolute(<span class="string">'d'</span>,0.260  ,<span class="string">'a'</span>,0      ,<span class="string">'alpha'</span>,(-pi/2)    ,<span class="string">'qlim'</span>,[-3.0543 3.0543],   <span class="string">'offset'</span>,(-80*pi)/180);
+L (5) = Revolute(<span class="string">'d'</span>,0      ,<span class="string">'a'</span>,0      ,<span class="string">'alpha'</span>,(pi/2)     ,<span class="string">'qlim'</span>,[-2.0945 2.0945],   <span class="string">'offset'</span>,0);
+L (6) = Revolute(<span class="string">'d'</span>,0.075  ,<span class="string">'a'</span>,0      ,<span class="string">'alpha'</span>,0          ,<span class="string">'qlim'</span>,[-6.1087 6.1087],   <span class="string">'offset'</span>,0);
+qz = [0 0 0 0 0 0]; <span class="comment">%Home position where all thetas are zero</span>
+KR3 = SerialLink(L,<span class="string">'name'</span>,<span class="string">'KUKA KR3 Agilus'</span>);
+KR3.manufacturer = <span class="string">'JD &amp; M'</span>;
+KR3.ikineType = <span class="string">'KR3'</span>;
+</pre><h2 id="2">Inputs</h2><pre class="codeinput"><span class="comment">% Points = conversionP('Trianguler_Piramid.csv');</span>
+Points = conversionC(<span class="string">'Circle.csv'</span>);
+N = length(Points(1,:));
+timeDuration = 10;<span class="comment">%input("please input time to complete task in seconds : ");</span>
+</pre><h2 id="3">Trajectory</h2><pre class="codeinput">tic
+[traj,T] = trajectory(Points,timeDuration);
+</pre><img vspace="5" hspace="5" src="First_Final_Model_01.png" alt=""> <h2 id="4">Inverse Kinematics</h2><pre class="codeinput"><span class="keyword">for</span> k = 1:N-1
+    <span class="keyword">for</span> h = 1:length(T)-1
+</pre><pre class="codeinput">        Des = traj(:,:,h,k);
+        <span class="keyword">if</span>(h == 1 &amp;&amp; k == 1)
+            Ini_val = geo_sol(Des);
+        <span class="keyword">elseif</span>(h==1 &amp;&amp; k~=1)
+            Ini_val = OPx(:,length(T)-1,k-1);
+        <span class="keyword">else</span>
+            Ini_val = OPx(:,h-1,k);
+        <span class="keyword">end</span>
+        Func = 1e-3;
+        Step = 1e-3;
+<span class="comment">%         fprintf('\n Fsolve iterating for the %d(%d) position in the trajectory.\n',k,h);</span>
+        options = optimoptions(<span class="string">'fsolve'</span>,<span class="string">'Display'</span>,<span class="string">'off'</span>,<span class="string">'Algorithm'</span>,<span class="string">'levenberg-marquardt'</span>,<span class="string">'FunValCheck'</span>,<span class="string">'on'</span>,<span class="string">'FunctionTolerance'</span>,Func,<span class="string">'StepTolerance'</span>,Step);
+        tempOpx(:,h,k) = fsolve(@ikine_Num,Ini_val,options,Des);
+</pre><img vspace="5" hspace="5" src="First_Final_Model_02.png" alt=""> <h2 id="6">Checking Joint Limitation</h2><pre class="codeinput">        OPx(:,h,k) = trimTheta(tempOpx(:,h,k),KR3);
+</pre><h2 id="7">Checking Singularities</h2><pre class="codeinput">        Jacobian(:,:,h,k) = KR3.jacob0(OPx(:,h,k));
+        Determinant(h,k) = det(Jacobian(:,:,h,k));
+        <span class="keyword">if</span> ((Determinant(h,k) &lt;= 1e-4) &amp;&amp; (Determinant(h,k) &gt;= (-(1e-4))))
+            fprintf(<span class="string">'\n Jacobian of the pose(%d(%d)).\n'</span>,k,h);
+            disp(Jacobian(:,:,h,k));
+            fprintf(<span class="string">'\n Determinant of the pose(%d(%d)): %f\n'</span>,k,h,Determinant(h,k));
+            warning(<span class="string">'Determinant of the pose is zero.It shows the singularity.'</span>)
+        <span class="keyword">end</span>
+</pre><pre class="codeoutput">
+ Jacobian of the pose(65(1)).
+    0.1263   -0.4421   -0.2300    0.0163    0.0189         0
+    0.2994    0.1975    0.1027    0.0507   -0.0011         0
+   -0.0000    0.3049    0.1883    0.0035   -0.0726         0
+    0.0000   -0.4078   -0.4078    0.4671    0.3048    0.9186
+    0.0000   -0.9131   -0.9131   -0.2086    0.9502   -0.3113
+    1.0000    0.0000    0.0000    0.8592    0.0650    0.2432
+
+
+ Determinant of the pose(65(1)): 0.000060
+Warning: Determinant of the pose is zero.It shows the
+singularity. 
+</pre><pre class="codeinput">    <span class="keyword">end</span>
+    TimeStamp(:,k) = T+((k-1)*(timeDuration/(N-1)));
+<span class="keyword">end</span>
+toc
+</pre><pre class="codeoutput">Elapsed time is 19.277089 seconds.
+</pre><h2 id="9">Simulink Data Generation</h2><pre class="codeinput">th1 = reshape(OPx(1,:,:),[],1);
+th2 = reshape(OPx(2,:,:),[],1);
+th3 = reshape(OPx(3,:,:),[],1);
+th4 = reshape(OPx(4,:,:),[],1);
+th5 = reshape(OPx(5,:,:),[],1);
+th6 = reshape(OPx(6,:,:),[],1);
+Time = linspace(0,timeDuration,length(th1))';
+
+Th1 = [Time th1];
+Th2 = [Time th2];
+Th3 = [Time th3];
+Th4 = [Time th4];
+Th5 = [Time th5];
+Th6 = [Time th6];
+DesX = [Time reshape(traj(1,4,:,:),[],1)];
+DesY = [Time reshape(traj(2,4,:,:),[],1)];
+DesZ = [Time reshape(traj(3,4,:,:),[],1)];
+theta = [th1 th2 th3 th4 th5 th6];
+
+wayPoints = [Points(1,:); Points(2,:); Points(3,:)]';
+
+save <span class="string">theta1.mat</span> <span class="string">Th1</span>;
+save <span class="string">theta2.mat</span> <span class="string">Th2</span>;
+save <span class="string">theta3.mat</span> <span class="string">Th3</span>;
+save <span class="string">theta4.mat</span> <span class="string">Th4</span>;
+save <span class="string">theta5.mat</span> <span class="string">Th5</span>;
+save <span class="string">theta6.mat</span> <span class="string">Th6</span>;
+save <span class="string">DesiredX.mat</span> <span class="string">DesX</span>;
+save <span class="string">DesiredY.mat</span> <span class="string">DesY</span>;
+save <span class="string">DesiredZ.mat</span> <span class="string">DesZ</span>;
+save <span class="string">EulTh.mat</span> <span class="string">theta</span>;
+</pre><h2 id="10">Simulink Model</h2><pre class="codeinput"> open_system(<span class="string">'Simscape_Model_ver_3.slx'</span>);
+</pre><pre class="codeoutput error">Error using First_Final_Model (line 101)
+Cannot load model '&lt;a href="matlab:open_system ('Simscape_Model_ver_3')"&gt;Simscape_Model_ver_3&lt;/a&gt;' with full path 'C:\Users\manav\MATLAB Drive\Quaternion\Final_Code\Eular_Simulink Model\Simscape_Model_ver_3.slx' because it has the same name as another model that is already loaded and has a different full path 'C:\Users\manav\MATLAB Drive\Quaternion\Simulink_Final_Model_Exception\Ver_3_3_with_Publish\Simscape_Model_ver_3.slx'. Either close the currently open model or rename one of the models and try again.
+
+Error in evalmxdom&gt;instrumentAndRun (line 109)
+text = evalc(evalstr);
+
+Error in evalmxdom (line 21)
+[data,text,laste] = instrumentAndRun(file,cellBoundaries,imageDir,imagePrefix,options);
+
+Error in publish
+
+Error in mdbpublish (line 55)</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% DH Parameter of Manipulator
+% abcd
+% abcd
+clear all;
+clc;
+close all;
+
+L (1) = Revolute('d',0.345  ,'a',0.02   ,'alpha',pi/2       ,'qlim',[-2.9671 2.9671],   'offset',0);
+L (2) = Revolute('d',0      ,'a',0.260  ,'alpha',0          ,'qlim',[-0.8727 2.9671],   'offset',0);
+L (3) = Revolute('d',0      ,'a',0.02   ,'alpha',pi/2       ,'qlim',[-2.7053 1.9198],   'offset',pi/2);
+L (4) = Revolute('d',0.260  ,'a',0      ,'alpha',(-pi/2)    ,'qlim',[-3.0543 3.0543],   'offset',(-80*pi)/180);
+L (5) = Revolute('d',0      ,'a',0      ,'alpha',(pi/2)     ,'qlim',[-2.0945 2.0945],   'offset',0);
+L (6) = Revolute('d',0.075  ,'a',0      ,'alpha',0          ,'qlim',[-6.1087 6.1087],   'offset',0);
+qz = [0 0 0 0 0 0]; %Home position where all thetas are zero
+KR3 = SerialLink(L,'name','KUKA KR3 Agilus');
+KR3.manufacturer = 'JD & M';
+KR3.ikineType = 'KR3';
+
+%% Inputs
+
+% Points = conversionP('Trianguler_Piramid.csv');
+Points = conversionC('Circle.csv');
+N = length(Points(1,:));
+timeDuration = 10;%input("please input time to complete task in seconds : ");
+
+%% Trajectory
+tic
+[traj,T] = trajectory(Points,timeDuration);
+
+%% Inverse Kinematics
+
+for k = 1:N-1
+    for h = 1:length(T)-1
+        Des = traj(:,:,h,k);
+        if(h == 1 && k == 1)
+            Ini_val = geo_sol(Des);
+        elseif(h==1 && k~=1)
+            Ini_val = OPx(:,length(T)-1,k-1); 
+        else
+            Ini_val = OPx(:,h-1,k);
+        end
+        Func = 1e-3;
+        Step = 1e-3; 
+%         fprintf('\n Fsolve iterating for the %d(%d) position in the trajectory.\n',k,h);
+        options = optimoptions('fsolve','Display','off','Algorithm','levenberg-marquardt','FunValCheck','on','FunctionTolerance',Func,'StepTolerance',Step);
+        tempOpx(:,h,k) = fsolve(@ikine_Num,Ini_val,options,Des);
+        
+        %% Checking Joint Limitation
+    
+        OPx(:,h,k) = trimTheta(tempOpx(:,h,k),KR3);
+        
+        %% Checking Singularities
+      
+        Jacobian(:,:,h,k) = KR3.jacob0(OPx(:,h,k));
+        Determinant(h,k) = det(Jacobian(:,:,h,k));
+        if ((Determinant(h,k) <= 1e-4) && (Determinant(h,k) >= (-(1e-4))))
+            fprintf('\n Jacobian of the pose(%d(%d)).\n',k,h);
+            disp(Jacobian(:,:,h,k));
+            fprintf('\n Determinant of the pose(%d(%d)): %f\n',k,h,Determinant(h,k));
+            warning('Determinant of the pose is zero.It shows the singularity.')
+        end  
+    end
+    TimeStamp(:,k) = T+((k-1)*(timeDuration/(N-1)));
+end
+toc
+%% Simulink Data Generation
+
+th1 = reshape(OPx(1,:,:),[],1);
+th2 = reshape(OPx(2,:,:),[],1);
+th3 = reshape(OPx(3,:,:),[],1);
+th4 = reshape(OPx(4,:,:),[],1);
+th5 = reshape(OPx(5,:,:),[],1);
+th6 = reshape(OPx(6,:,:),[],1);
+Time = linspace(0,timeDuration,length(th1))';
+
+Th1 = [Time th1];
+Th2 = [Time th2];
+Th3 = [Time th3];
+Th4 = [Time th4];
+Th5 = [Time th5];
+Th6 = [Time th6];
+DesX = [Time reshape(traj(1,4,:,:),[],1)];
+DesY = [Time reshape(traj(2,4,:,:),[],1)];
+DesZ = [Time reshape(traj(3,4,:,:),[],1)];
+theta = [th1 th2 th3 th4 th5 th6];
+
+wayPoints = [Points(1,:); Points(2,:); Points(3,:)]';
+
+save theta1.mat Th1;
+save theta2.mat Th2;
+save theta3.mat Th3;
+save theta4.mat Th4;
+save theta5.mat Th5;
+save theta6.mat Th6;
+save DesiredX.mat DesX;
+save DesiredY.mat DesY;
+save DesiredZ.mat DesZ;
+save EulTh.mat theta;
+%% Simulink Model
+
+ open_system('Simscape_Model_ver_3.slx');
+
+##### SOURCE END #####
+--></body></html>
