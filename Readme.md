@@ -233,5 +233,5 @@ All the files starting as "uquatmulti.m", "dquatmulti.m" and "uquatmultimatrix.m
 
 For any quarry contact on the following E-mail id's.
 
-Jaydeep Dervariya = jaydeep.d.btechm16@ahduni.edu.in
-Manav Chotalia = manav.c.btechi16@ahduni.edu.in
+Jaydeep Dervariya = jaydeepdervariya2411@gmail.com
+Manav Chotalia = manavchotalia@gmail.com
